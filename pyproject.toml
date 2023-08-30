@@ -1,0 +1,121 @@
+[tool.poetry]
+name = "disnake-ext-oauth2"
+description = "An easy to use discord Oauth2 extension for disnake"
+version = "0.0.1a"
+authors = ["Snipy7374 <snipy7374@gmail.com>"]
+readme = "README.md"
+license = "MIT"
+
+
+[tool.poetry.dependencies]
+python = ">=3.8"
+disnake = "^2.8.0"
+
+
+[tool.poetry.group.dev.dependencies]
+pyright = "^1.1.324"
+black = "^23.7.0"
+pre-commit = "^3.3.3"
+isort = "^5.12.0"
+ruff = "^0.0.286"
+
+
+[tool.poetry.group.docs.dependencies]
+sphinx = "^7.1.0"
+sphinx-autobuild = "^2021.3.14"
+
+
+[tool.pyright]
+include = ["disnake"]
+typeCheckingMode = "strict"
+
+
+[tool.black]
+line-lenght = 100
+target-version = ["py38", "py39", "py310", "py311"]
+
+
+[tool.isort]
+profile = "black"
+py_version = 38
+line_length = 100
+combine_as_imports = true
+filter_files = true
+
+
+[tool.ruff]
+line-length = 100
+target-version = "py38"
+select = [
+    # commented out codes are intended to be enabled in future prs
+    "F", # pyflakes
+    "E", "W", # pycodestyle
+    # "D", # pydocstyle
+    "D2",  # pydocstyle, docstring formatting
+    "D4",  # pydocstyle, docstring structure/content
+    # "ANN", # flake8-annotations
+    "S", # flake8-bandit
+    "B", # flake8-bugbear
+    "C4", # flake8-comprehensions
+    "DTZ", # flake8-datetimez
+    # "EM", # flake8-errmsg
+    "G", # flake8-logging-format
+    # "RET", # flake8-return
+    # "SIM", # flake8-simplify
+    "TID251", # flake8-tidy-imports, replaces S404
+    # "TCH", # flake8-type-checking
+    "RUF",    # ruff specific exceptions
+    "PT",     # flake8-pytest-style
+    "Q",      # flake8-quotes
+    "RSE",    # flake8-raise
+    "T20",    # flake8-print
+    "PGH",    # pygrep-hooks
+    "PLC",    # pylint convention
+    "PLE",    # pylint error
+    # "PLR",    # pylint refactor
+    "PLW",    # pylint warnings
+    "TRY002", "TRY004", "TRY201", # tryceratops
+]
+ignore = [
+    # star imports
+    "F403",
+
+    # pydocstyle
+    "D203", # incompat with D211
+    "D213", # multiline docstring should start on second line, incompatiable with D212
+    "D400", # first line ends in period, does not work with `|coro|` etc.
+    "D415", # same thing but punctuation in general
+    "D416", # section name should end with a colon, incompatible with D406
+
+    # unknown if this is actually an issue
+    "RUF005", # might not be actually faster
+    "RUF006", # might not be an issue/very extreme cases
+
+    # ignore try-except-pass. Bare excepts are caught with E722
+    "S110",
+
+    # provide specific codes on type: ignore
+    "PGH003",
+
+    # import aliases are fixed by isort
+    "PLC0414",
+
+
+    # outer loop variables are overwritten by inner assignment target, these are mostly intentional
+    "PLW2901",
+
+    # temporary disables, to fix later
+    "D205",   # blank line required between summary and description
+    "D401",   # first line of docstring should be in imperative mood
+    "D417",   # missing argument description in docstring
+    "B904",   # within an except clause raise from error or from none
+    "B026",   # backwards star-arg unpacking
+    "E501",   # line too long
+    "E731",   # assigning lambdas to variables
+    "T201",   # print statements
+]
+
+
+[tool.ruff.flake8-pytest-style]
+fixture-parentheses = false
+mark-parentheses = false

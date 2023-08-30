@@ -1,0 +1,7 @@
+.venv
+.env
+venv
+env
+
+disnake/ext/oauth2/__pycache__
+poetry.lock
