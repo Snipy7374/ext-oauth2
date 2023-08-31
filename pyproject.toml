@@ -1,10 +1,11 @@
 [tool.poetry]
 name = "disnake-ext-oauth2"
-description = "An easy to use discord Oauth2 extension for disnake"
+description = "An easy to use framework-agnostic discord Oauth2 extension for disnake"
 version = "0.0.1a"
 authors = ["Snipy7374 <snipy7374@gmail.com>"]
 readme = "README.md"
 license = "MIT"
+packages = [{include = "disnake/ext/oauth2", from="src"}]
 
 
 [tool.poetry.dependencies]
@@ -25,9 +26,14 @@ sphinx = "^7.1.0"
 sphinx-autobuild = "^2021.3.14"
 
 
+[tool.poetry.scripts]
+dev-symlink = "scripts.symlink:_main"
+
+
 [tool.pyright]
 include = ["disnake"]
 typeCheckingMode = "strict"
+reportPrivateUsage = false
 
 
 [tool.black]
