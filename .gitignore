@@ -5,6 +5,6 @@ env
 
 test.py
 __pycache__
-disnake/ext/oauth2/__pycache__
+oauth2/__pycache__
 poetry.lock
-src/disnake/ext/oauth2/scopes.py
+oauth2/scopes.py
