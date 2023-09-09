@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "disnake-ext-oauth2"
-description = "An easy to use framework-agnostic discord Oauth2 extension for disnake"
+description = "An easy to use framework-agnostic and library agnostic discord Oauth2 extension"
 version = "0.0.1a"
 authors = ["Snipy7374 <snipy7374@gmail.com>"]
 readme = "README.md"
