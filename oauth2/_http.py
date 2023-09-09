@@ -7,10 +7,10 @@ from urllib.parse import quote as _uriquote
 
 import aiohttp
 
-from disnake.ext.oauth2 import __version__
+from oauth2 import __version__
 
 if TYPE_CHECKING:
-    from disnake.ext.oauth2.types import (
+    from oauth2.types import (
         AccessExchangeTokenPayload,
         AccessTokenResponse,
         ClientCredentialsPayload,

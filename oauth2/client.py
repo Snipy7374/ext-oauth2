@@ -5,11 +5,11 @@ from typing import TYPE_CHECKING, Optional, Tuple, Union
 
 import aiohttp
 
-from ._http import HTTPClient
-from .token import AccessToken
+from oauth2._http import HTTPClient
+from oauth2.token import AccessToken
 
 if TYPE_CHECKING:
-    from .types.payloads import (
+    from oauth2.types.payloads import (
         AccessExchangeTokenPayload,
         ClientCredentialsPayload,
         RefreshTokenPayload,

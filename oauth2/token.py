@@ -1,11 +1,16 @@
 from __future__ import annotations
+
+import datetime
 from typing import TYPE_CHECKING, Optional, Union
 
 import attrs
-import datetime
 
 if TYPE_CHECKING:
-    from .types import AccessTokenResponse, AccessTokenDict, ClientCredentialsResponse
+    from oauth2.types import (
+        AccessTokenDict,
+        AccessTokenResponse,
+        ClientCredentialsResponse,
+    )
 
 
 def to_datetime(_v: str) -> datetime.datetime:
@@ -23,14 +28,17 @@ class AccessToken:
     scope: str
 
     @classmethod
-    def from_data(cls, data: Union[AccessTokenResponse, ClientCredentialsResponse]) -> AccessToken:
+    def from_data(
+        cls, data: Union[AccessTokenResponse, ClientCredentialsResponse]
+    ) -> AccessToken:
         return cls(
             data["access_token"],
             data["token_type"],
             data["expires_in"],
             (
-                data["refresh_token"] if "refresh_token" in data.keys()  # type: ignore
-                else None  # type: ignore
+                data["refresh_token"]  # type: ignore
+                if "refresh_token" in data.keys()
+                else None
             ),
             data["scope"],
         )
@@ -43,6 +51,10 @@ class AccessToken:
         Note that this method excludes falsy values.
         """
         return {
-            k: v for k in self.__slots__
-            if not k.startswith("__") and (v := self.__getattribute__(k)) # excluding dunder methods and falsy values
+            k: v
+            for k in self.__slots__
+            if not k.startswith("__")
+            and (
+                v := self.__getattribute__(k)
+            )  # excluding dunder methods and falsy values
         }  # type: ignore
