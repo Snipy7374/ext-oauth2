@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import asyncio
 from typing import TYPE_CHECKING, Optional, Tuple, Union
 
@@ -17,6 +18,7 @@ if TYPE_CHECKING:
     )
 
 __all__: Tuple[str, ...] = ("Client",)
+_log = logging.getLogger(__name__)
 
 
 class Client:

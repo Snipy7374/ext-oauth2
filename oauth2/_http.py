@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import asyncio
 import sys
 from typing import TYPE_CHECKING, Any, ClassVar, Dict, Optional, Tuple
@@ -20,6 +21,7 @@ if TYPE_CHECKING:
     )
 
 __all__: Tuple[str, ...] = ("HTTPClient", "Route")
+_log = logging.getLogger(__name__)
 
 
 class Route:
@@ -53,6 +55,7 @@ class HTTPClient:
 
     async def create_session(self) -> None:
         self.__session = aiohttp.ClientSession(connector=self._connector)
+        _log.debug("Session object created")
 
     async def request(self, route: Route, **kwargs: Any) -> Any:
         method = route.method
@@ -73,6 +76,7 @@ class HTTPClient:
         auth = None
         if auth := kwargs.get("auth"):
             auth = aiohttp.BasicAuth(auth["client_id"], auth["client_secret"])
+            _log.debug("Authenticating a request using client credentials as Login and Password")
 
         payload: Dict[str, str] = kwargs.get("payload") or {}
 
