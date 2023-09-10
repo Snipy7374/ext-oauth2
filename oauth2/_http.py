@@ -85,28 +85,53 @@ class HTTPClient:
             return await response.json()
 
     async def _exchange_token(
-        self, payload: AccessExchangeTokenPayload
+        self, *, id: int, secret: str, code: str, redirect_uri: str
     ) -> AccessTokenResponse:
+        payload: AccessExchangeTokenPayload = {
+            "client_id": id,
+            "client_secret": secret,
+            "grant_type": "authorization_code",
+            "code": code,
+            "redirect_uri": redirect_uri,
+        }
+
         return await self.request(
             Route("POST", "/oauth2/token"),
             payload=payload,
         )
 
-    async def _refresh_token(self, payload: RefreshTokenPayload) -> AccessTokenResponse:
+    async def _refresh_token(self, *, id: int, secret: str, refresh_token: str) -> AccessTokenResponse:
+        payload: RefreshTokenPayload = {
+            "client_id": id,
+            "client_secret": secret,
+            "grant_type": "refresh_token",
+            "refresh_token": refresh_token,
+        }
+
         return await self.request(
             Route("POST", "/oauth2/token"),
             payload=payload,
         )
 
-    async def _revoke_token(self, payload: RevokeTokenPayload) -> None:
+    async def _revoke_token(self, *, id: int, secret: str, token: str, token_type: str) -> None:
+        payload: RevokeTokenPayload = {
+            "client_id": id,
+            "client_secret": secret,
+            "token": token,
+            "token_type": token_type,
+        }
+
         return await self.request(
             Route("POST", "/oauth2/token/revoke"),
             payload=payload,
         )
 
-    async def _get_client_credentials_token(
-        self, payload: ClientCredentialsPayload, **kwargs: Any
-    ) -> ClientCredentialsResponse:
+    async def _get_client_credentials_token(self, **kwargs: Any) -> ClientCredentialsResponse:
+        payload: ClientCredentialsPayload = {
+            "grant_type": "client_credentials",
+            "scope": "identify",
+        }
+
         return await self.request(
             Route("POST", "/oauth2/token"), payload=payload, **kwargs
         )
