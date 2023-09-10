@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import logging
 import asyncio
+import logging
 import sys
 from typing import TYPE_CHECKING, Any, ClassVar, Dict, Optional, Tuple
 from urllib.parse import quote as _uriquote
@@ -76,7 +76,9 @@ class HTTPClient:
         auth = None
         if auth := kwargs.get("auth"):
             auth = aiohttp.BasicAuth(auth["client_id"], auth["client_secret"])
-            _log.debug("Authenticating a request using client credentials as Login and Password")
+            _log.debug(
+                "Authenticating a request using client credentials as Login and Password"
+            )
 
         payload: Dict[str, str] = kwargs.get("payload") or {}
 
@@ -100,7 +102,9 @@ class HTTPClient:
             payload=payload,
         )
 
-    async def _refresh_token(self, *, id: int, secret: str, refresh_token: str) -> AccessTokenResponse:
+    async def _refresh_token(
+        self, *, id: int, secret: str, refresh_token: str
+    ) -> AccessTokenResponse:
         payload: RefreshTokenPayload = {
             "client_id": id,
             "client_secret": secret,
@@ -113,7 +117,9 @@ class HTTPClient:
             payload=payload,
         )
 
-    async def _revoke_token(self, *, id: int, secret: str, token: str, token_type: str) -> None:
+    async def _revoke_token(
+        self, *, id: int, secret: str, token: str, token_type: str
+    ) -> None:
         payload: RevokeTokenPayload = {
             "client_id": id,
             "client_secret": secret,
@@ -126,7 +132,9 @@ class HTTPClient:
             payload=payload,
         )
 
-    async def _get_client_credentials_token(self, **kwargs: Any) -> ClientCredentialsResponse:
+    async def _get_client_credentials_token(
+        self, **kwargs: Any
+    ) -> ClientCredentialsResponse:
         payload: ClientCredentialsPayload = {
             "grant_type": "client_credentials",
             "scope": "identify",
