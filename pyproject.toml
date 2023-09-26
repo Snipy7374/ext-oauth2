@@ -30,6 +30,11 @@ sphinx-autobuild = "^2021.3.14"
 include = ["oauth2"]
 typeCheckingMode = "strict"
 reportPrivateUsage = false
+reportUnknownVariableType = false
+reportUnknownParameterType = false
+reportUnknownArgumentType = false
+reportUnusedFunction = false
+reportMissingTypeArgument = false
 
 
 [tool.black]

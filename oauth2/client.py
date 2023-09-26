@@ -2,12 +2,14 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple
 
 import aiohttp
 
 from oauth2._http import HTTPClient
-from oauth2.token import AccessToken
+from oauth2.appinfo import AppInfo
+from oauth2.scopes import OAuthScopes
+from oauth2.session import OAuth2Session
 
 __all__: Tuple[str, ...] = ("Client",)
 _log = logging.getLogger(__name__)
@@ -18,52 +20,37 @@ class Client:
         self,
         client_id: int,
         *,
+        scopes: OAuthScopes,
         client_secret: str,
         redirect_uri: str,
+        bot_token: Optional[str] = None,
         connector: Optional[aiohttp.BaseConnector] = None,
         loop: Optional[asyncio.AbstractEventLoop] = None,
     ) -> None:
-        self.id = client_id
-        self._secret = client_secret
+        self.client_id = client_id
         self.redirect_uri = redirect_uri
+        self._scopes = scopes
+
         # should raise a deprecation warning
         self.loop = loop or asyncio.get_event_loop()
-        self.http = HTTPClient(connector, self.loop)
+        self.http = HTTPClient(
+            connector,
+            self.loop,
+            client_id=client_id,
+            client_secret=client_secret,
+            bot_token=bot_token,
+        )
 
-    async def exchange_code(self, code: str) -> AccessToken:
+    async def exchange_code(self, code: str) -> OAuth2Session:
         data = await self.http._exchange_token(
-            id=self.id, secret=self._secret, code=code, redirect_uri=self.redirect_uri
+            code=code, redirect_uri=self.redirect_uri
         )
-        return AccessToken.from_data(data)
+        return OAuth2Session.from_data(data, self)
 
-    async def refresh_token(self, refresh_token: str) -> AccessToken:
-        data = await self.http._refresh_token(
-            id=self.id, secret=self._secret, refresh_token=refresh_token
-        )
-        return AccessToken.from_data(data)
+    async def get_client_credentials_token(self) -> OAuth2Session:
+        data = await self.http._get_client_credentials_token()
+        return OAuth2Session.from_data(data, self)
 
-    async def revoke_token(
-        self, token: Union[AccessToken, str], *, token_type: Optional[str] = None
-    ) -> None:
-        if isinstance(token, AccessToken) and token_type:
-            raise ValueError("Can't provide 'token_type' in conjunction with 'token'")
-
-        if isinstance(token, str) and not token_type:
-            raise ValueError(
-                "The 'token_type' argument is required if passing a string token"
-            )
-
-        await self.http._revoke_token(
-            id=self.id,
-            secret=self._secret,
-            token=(token.access_token if isinstance(token, AccessToken) else token),
-            token_type=(
-                token.token_type if isinstance(token, AccessToken) else token_type  # type: ignore
-            ),
-        )
-
-    async def get_client_credentials_token(self) -> AccessToken:
-        data = await self.http._get_client_credentials_token(
-            auth={"client_id": str(self.id), "client_secret": self._secret}
-        )
-        return AccessToken.from_data(data)
+    async def get_application_info(self) -> AppInfo:
+        data = await self.http._get_app_info()
+        return AppInfo.from_payload(data, self.http)

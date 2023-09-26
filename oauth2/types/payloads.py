@@ -33,6 +33,8 @@ class _AccessToken(TypedDict):
 
 class AccessTokenResponse(_AccessToken):
     refresh_token: str
+    guild_id: str
+    permissions: str
 
 
 class ClientCredentialsPayload(TypedDict):
