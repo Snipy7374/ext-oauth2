@@ -94,8 +94,7 @@ class HTTPClient:
                 "Content-Type": "application/x-www-form-urlencoded",
             }
 
-        auth = None
-        if kwargs.get("auth"):
+        if auth := kwargs.get("auth"):
             bearer = False
             auth = aiohttp.BasicAuth(str(self._client_id), self.__client_secret)
             _log.debug(
