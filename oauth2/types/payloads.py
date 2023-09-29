@@ -1,6 +1,9 @@
-from typing import Tuple, TypedDict
+from typing import TYPE_CHECKING, Tuple, TypedDict
 
 from typing_extensions import NotRequired
+
+if TYPE_CHECKING:
+    from oauth2.types import Guild
 
 __all__: Tuple[str, ...] = (
     "AccessExchangeTokenPayload",
@@ -10,6 +13,7 @@ __all__: Tuple[str, ...] = (
     "ClientCredentialsResponse",
     "RefreshTokenPayload",
     "RevokeTokenPayload",
+    "GetGuildsParams",
 )
 
 
@@ -33,8 +37,7 @@ class _AccessToken(TypedDict):
 
 class AccessTokenResponse(_AccessToken):
     refresh_token: str
-    guild_id: str
-    permissions: str
+    guild: NotRequired[Guild]
 
 
 class ClientCredentialsPayload(TypedDict):
@@ -58,3 +61,10 @@ class RevokeTokenPayload(TypedDict):
     client_secret: str
     token: str
     token_type: str
+
+
+class GetGuildsParams(TypedDict, total=False):
+    before: int
+    after: int
+    limit: int
+    with_counts: bool

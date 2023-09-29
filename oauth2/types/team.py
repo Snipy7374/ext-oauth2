@@ -2,12 +2,16 @@
 
 from __future__ import annotations
 
-from typing import List, Literal, Optional, TypedDict, Tuple
+from typing import List, Literal, Optional, Tuple, TypedDict
 
 from oauth2.types import Snowflake
+
 from .user import PartialUser
 
-__all__: Tuple[str, ...] = ("Team", "TeamMember",)
+__all__: Tuple[str, ...] = (
+    "Team",
+    "TeamMember",
+)
 
 
 TeamMembershipState = Literal[1, 2]

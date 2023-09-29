@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import sys
-from typing import TYPE_CHECKING, Any, ClassVar, Dict, Optional, Tuple
+from typing import TYPE_CHECKING, Any, ClassVar, Dict, List, Optional, Tuple
 from urllib.parse import quote as _uriquote
 
 import aiohttp
@@ -11,6 +11,7 @@ import aiohttp
 from oauth2 import __version__
 
 if TYPE_CHECKING:
+    from oauth2.scopes import OAuthScopes
     from oauth2.types import (
         AccessExchangeTokenPayload,
         AccessTokenResponse,
@@ -18,8 +19,11 @@ if TYPE_CHECKING:
         AuthInfo,
         ClientCredentialsPayload,
         ClientCredentialsResponse,
+        GetGuildsParams,
+        PartialGuild,
         RefreshTokenPayload,
         RevokeTokenPayload,
+        User,
     )
 
 __all__: Tuple[str, ...] = ("HTTPClient", "Route")
@@ -74,7 +78,7 @@ class HTTPClient:
             resp.raise_for_status()
             return await resp.read()
 
-    async def request(self, route: Route, **kwargs: Any) -> Any:
+    async def request(self, route: Route, bearer: bool = True, **kwargs: Any) -> Any:
         method = route.method
         url = route.url
 
@@ -92,14 +96,19 @@ class HTTPClient:
 
         auth = None
         if kwargs.get("auth"):
+            bearer = False
             auth = aiohttp.BasicAuth(str(self._client_id), self.__client_secret)
             _log.debug(
                 "Authenticating a request using client credentials as Login and Password"
             )
 
-        payload: Dict[str, str] = kwargs.get("payload") or {}
+        if bearer:
+            headers["Authorization"] = f"Bearer {kwargs['access_token']}"
 
-        async with self.__session.request(method, url, data=payload, headers=headers, auth=auth) as response:  # type: ignore
+        payload: Dict[str, Any] = kwargs.get("payload") or {}
+        params: Dict[str, Any] = kwargs.get("params") or {}
+
+        async with self.__session.request(method, url, data=payload, headers=headers, auth=auth, params=params) as response:  # type: ignore
             response.raise_for_status()
             return await response.json()
 
@@ -115,8 +124,7 @@ class HTTPClient:
         }
 
         return await self.request(
-            Route("POST", "/oauth2/token"),
-            payload=payload,
+            Route("POST", "/oauth2/token"), payload=payload, bearer=False
         )
 
     async def _refresh_token(self, *, refresh_token: str) -> AccessTokenResponse:
@@ -128,8 +136,7 @@ class HTTPClient:
         }
 
         return await self.request(
-            Route("POST", "/oauth2/token"),
-            payload=payload,
+            Route("POST", "/oauth2/token"), payload=payload, bearer=False
         )
 
     async def _revoke_token(self, *, token: str, token_type: str) -> None:
@@ -141,14 +148,15 @@ class HTTPClient:
         }
 
         return await self.request(
-            Route("POST", "/oauth2/token/revoke"),
-            payload=payload,
+            Route("POST", "/oauth2/token/revoke"), payload=payload, bearer=False
         )
 
-    async def _get_client_credentials_token(self) -> ClientCredentialsResponse:
+    async def _get_client_credentials_token(
+        self, scopes: OAuthScopes
+    ) -> ClientCredentialsResponse:
         payload: ClientCredentialsPayload = {
             "grant_type": "client_credentials",
-            "scope": "identify",
+            "scope": scopes.as_client_credentials(),
         }
 
         return await self.request(
@@ -159,10 +167,149 @@ class HTTPClient:
         return await self.request(
             Route("GET", "/oauth2/applications/@me"),
             headers={"Authorization": f"Bot {self.__bot_token}"},
+            bearer=False,
         )
 
     async def _get_current_auth_info(self, access_token: str) -> AuthInfo:
         return await self.request(
-            Route("GET", "/oauth2/@me"),
-            headers={"Authorization": f"Bearer {access_token}"},
+            Route("GET", "/oauth2/@me"), access_token=access_token
+        )
+
+    async def _get_current_user(self, access_token: str) -> User:
+        return await self.request(
+            Route("GET", "/users/@me"),
+            access_token=access_token,
+        )
+
+    async def _edit_user(
+        self, username: Optional[str], avatar: Optional[str], access_token: str
+    ) -> User:
+        payload = {}
+
+        if username:
+            payload["username"] = username
+        if avatar:
+            payload["avatar"] = avatar
+
+        return await self.request(
+            Route("PATCH", "/users/@me"),
+            payload=payload,
+            access_token=access_token,
+        )
+
+    async def _get_user_guids(
+        self,
+        before: Optional[int],
+        after: Optional[int],
+        limit: int,
+        with_counts: bool,
+        access_token: str,
+    ) -> List[PartialGuild]:
+        params: GetGuildsParams = {"limit": limit, "with_counts": with_counts}
+
+        if before:
+            params["before"] = before
+        if after:
+            params["after"] = after
+
+        return await self.request(
+            Route("GET", "/users/@me/guilds"), params=params, access_token=access_token
+        )
+
+    async def _get_user_connections(self, access_token: str):
+        return await self.request(
+            Route("GET", "/users/@me/connections"), access_token=access_token
+        )
+
+    async def _get_user_application_connection(
+        self, application_id: int, access_token: str
+    ):
+        return await self.request(
+            Route("GET", f"/users/@me/applications/{application_id}/role-connection"),
+            access_token=access_token,
+        )
+
+    # TODO: finish the implementation https://discord.com/developers/docs/resources/user#update-user-application-role-connection
+    async def _update_user_application_connection(
+        self,
+        application_id: int,
+        platform_name: Optional[str],
+        platform_username: Optional[str],
+        metadata: ...,
+        access_token: str,
+    ):
+        payload = {}
+        return await self.request(
+            Route("PUT", f"/users/@me/applications/{application_id}/role-connection"),
+            payload=payload,
+            access_token=access_token,
+        )
+
+    async def _get_guild_member(self, guild_id: int, access_token: str):
+        return await self.request(
+            Route("GET", f"/users/@me/guilds/{guild_id}/member"),
+            access_token=access_token,
+        )
+
+    async def _add_guild_member(
+        self,
+        guild_id: int,
+        user_id: int,
+        nick: Optional[str],
+        roles: List[int],
+        mute: Optional[bool],
+        deaf: Optional[bool],
+        access_token: str,
+    ):
+        payload = {"access_token": access_token}
+
+        if nick:
+            payload["nick"] = nick
+        if roles:
+            payload["roles"] = roles
+        if mute:
+            payload["mute"] = mute
+        if deaf:
+            payload["deaf"] = deaf
+
+        return await self.request(
+            Route("PUT", f"/guilds/{guild_id}/members/{user_id}"),
+            bearer=False,
+            headers={"Authorization": f"Bot {self.__bot_token}"},
+            payload=payload,
+        )
+
+    async def _create_dm(self, member_id: int, access_token: str):
+        payload = {"recipient_id": member_id}
+
+        return await self.request(
+            Route("POST", "/users/@me/channels"),
+            access_token=access_token,
+            payload=payload,
+        )
+
+    async def _create_group_dm(
+        self, access_tokens: List[str], nicks: Dict[int, str], access_token: str
+    ):
+        payload = {"access_tokens": access_tokens, "nicks": nicks}
+
+        return await self.request(
+            Route("POST", "/users/@me/channels"),
+            access_token=access_token,
+            payload=payload,
+        )
+
+    async def _group_dm_add_user(
+        self,
+        channel_id: int,
+        user_id: int,
+        nick: str,
+        user_access_token: str,
+        access_token: str,
+    ):
+        payload = {"access_token": user_access_token, "nick": nick}
+        return await self.request(
+            Route("PUT", f"/channels/{channel_id}/recipients/{user_id}"),
+            payload=payload,
+            access_token=access_token,
         )

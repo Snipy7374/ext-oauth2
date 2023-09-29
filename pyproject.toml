@@ -31,6 +31,7 @@ include = ["oauth2"]
 typeCheckingMode = "strict"
 reportPrivateUsage = false
 reportUnknownVariableType = false
+reportUnknownMemberType = false
 reportUnknownParameterType = false
 reportUnknownArgumentType = false
 reportUnusedFunction = false

@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
-from typing import List, Optional, TypedDict, Tuple
+from typing import List, Optional, Tuple, TypedDict
 
 from typing_extensions import NotRequired
 
-from oauth2.types import Snowflake
-from oauth2.types import Team, User
+from oauth2.types import Snowflake, Team, User
 
 __all__: Tuple[str, ...] = (
     "AppInfo",

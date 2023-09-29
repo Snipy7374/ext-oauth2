@@ -1,8 +1,9 @@
 from __future__ import annotations
-from typing import Optional, List, TYPE_CHECKING
+
+import enum
+from typing import TYPE_CHECKING, List, Optional
 
 import attrs
-import enum
 
 if TYPE_CHECKING:
     from oauth2.types import Team as TeamPayload, TeamMember as TeamMemberPayload
@@ -33,7 +34,7 @@ class TeamMember:
             id=payload["user"]["id"],  # type: ignore
             permissions=payload["permissions"],
             membership_state=payload["membership_state"],
-            team=team
+            team=team,
         )
 
 
@@ -52,7 +53,7 @@ class Team:
             name=payload["name"],
             members=[],
             _icon=payload.get("icon"),
-            owner_id=payload.get("owner_user_id")  # type: ignore
+            owner_id=payload.get("owner_user_id"),  # type: ignore
         )
         team.members = [TeamMember.from_payload(i, team) for i in payload["members"]]
         return team

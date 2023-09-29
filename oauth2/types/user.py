@@ -1,6 +1,6 @@
 # thanks disnake
 
-from typing import Literal, Optional, TypedDict, Tuple
+from typing import Literal, Optional, Tuple, TypedDict
 
 from typing_extensions import NotRequired
 
@@ -24,10 +24,12 @@ PremiumType = Literal[0, 1, 2]
 
 
 class User(PartialUser, total=False):
+    banner: Optional[str]
+    accent_colour: Optional[str]
     bot: bool
     system: bool
     mfa_enabled: bool
-    local: str
+    locale: str
     verified: bool
     email: Optional[str]
     flags: int
