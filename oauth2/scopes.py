@@ -64,5 +64,15 @@ class OAuthScopes(enum.IntFlag):
     def none(cls) -> OAuthScopes:
         return cls(0)
 
+    @classmethod
+    def all(cls) -> OAuthScopes:
+        scopes = cls.activities_read
+        for scope in cls._member_map_.values():
+            scopes |= scope  # type: ignore
+        return scopes
+
     def as_url_param(self) -> str:
         return "%20".join(scope.api_name for scope in self)
+
+    def as_client_credentials(self) -> str:
+        return " ".join(scope.api_name for scope in self)
