@@ -1,9 +1,12 @@
 from __future__ import annotations
-from typing import TypedDict, List, Literal, Optional, Tuple, Any
+
+from typing import Any, List, Literal, Optional, Tuple, TypedDict
+
 from typing_extensions import NotRequired
 
+from oauth2.types import Emoji, GuildSticker, Role
+
 from . import Snowflake
-from oauth2.types import Emoji, Role, GuildSticker
 
 __all__: Tuple[str, ...] = ("PartialGuild", "GuildFeature", "Guild")
 
@@ -112,10 +115,10 @@ class Guild(_BaseGuild):
     # new undocumented attributes
     # if you know what types they're returning open a PR or reach
     # me out pls!
-    latest_onboarding_question_id: Optional[Snowflake] # ? taking a guess
-    inventory_settings: Optional[Any] # ?
-    incidents_data: Optional[Any] # ?
-    hub_type: Optional[Any] # ?
-    home_header: Optional[Any] # ?
-    embed_enabled: NotRequired[bool] # ? taking a guess
-    embed_channel_id: NotRequired[Optional[Snowflake]] # ? taking a guess
+    latest_onboarding_question_id: Optional[Snowflake]  # ? taking a guess
+    inventory_settings: Optional[Any]  # ?
+    incidents_data: Optional[Any]  # ?
+    hub_type: Optional[Any]  # ?
+    home_header: Optional[Any]  # ?
+    embed_enabled: NotRequired[bool]  # ? taking a guess
+    embed_channel_id: NotRequired[Optional[Snowflake]]  # ? taking a guess

@@ -1,9 +1,8 @@
-from typing import TYPE_CHECKING, Tuple, TypedDict
+from typing import Tuple, TypedDict
 
 from typing_extensions import NotRequired
 
-if TYPE_CHECKING:
-    from oauth2.types import Guild
+from . import ApplicationRoleConnectionMetadata, Guild
 
 __all__: Tuple[str, ...] = (
     "AccessExchangeTokenPayload",
@@ -14,6 +13,7 @@ __all__: Tuple[str, ...] = (
     "RefreshTokenPayload",
     "RevokeTokenPayload",
     "GetGuildsParams",
+    "AppRoleConnectionPayload",
 )
 
 
@@ -68,3 +68,9 @@ class GetGuildsParams(TypedDict, total=False):
     after: int
     limit: int
     with_counts: bool
+
+
+class AppRoleConnectionPayload(TypedDict, total=False):
+    platform_name: str
+    platform_username: str
+    metadata: ApplicationRoleConnectionMetadata

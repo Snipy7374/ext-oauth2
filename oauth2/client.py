@@ -80,7 +80,9 @@ class Client:
             disable_guild_select=disable_guild_select,
         )
 
-    async def exchange_code(self, code: str, state: Optional[str]) -> OAuth2Session:
+    async def exchange_code(
+        self, code: str, state: Optional[str] = None
+    ) -> OAuth2Session:
         data = await self.http._exchange_token(
             code=code, redirect_uri=self.redirect_uri
         )
@@ -99,4 +101,4 @@ class Client:
 
     async def fetch_application_info(self) -> AppInfo:
         data = await self.http._get_app_info()
-        return AppInfo.from_payload(data, self.http)
+        return AppInfo.from_data(data, self.http)

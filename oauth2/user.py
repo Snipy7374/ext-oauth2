@@ -6,13 +6,18 @@ from typing import TYPE_CHECKING, AsyncIterator, List, Optional
 import attrs
 
 from oauth2.asset import Asset
+from oauth2.connection import (
+    ApplicationRoleConnection,
+    ApplicationRoleConnectionMetadata,
+    Connection,
+)
 from oauth2.guild import PartialGuild
 
 if TYPE_CHECKING:
     from oauth2._http import HTTPClient
     from oauth2.file import File
     from oauth2.session import OAuth2Session
-    from oauth2.types import User as UserPayload
+    from oauth2.types import User as UserData
 
 
 @attrs.define(slots=True, repr=True)
@@ -37,25 +42,25 @@ class User:
     _accent_colour: Optional[str] = None
 
     @classmethod
-    def from_payload(
-        cls, payload: UserPayload, http: HTTPClient, session: OAuth2Session
+    def from_data(
+        cls, data: UserData, http: HTTPClient, session: OAuth2Session
     ) -> User:
         return cls(
             _http=http,
-            id=payload["id"],  # type: ignore
-            username=payload["username"],
-            discriminator=payload["discriminator"],
-            bot=payload.get("bot", False),
-            system=payload.get("system", False),
-            mfa_enabled=payload.get("mfa_enabled", False),
+            id=data["id"],  # type: ignore
+            username=data["username"],
+            discriminator=data["discriminator"],
+            bot=data.get("bot", False),
+            system=data.get("system", False),
+            mfa_enabled=data.get("mfa_enabled", False),
             _session=session,
-            locale=payload.get("locale"),
-            verified=payload.get("verified", False),
-            _public_flags=payload.get("public_flags", 0),
-            premium_type=payload.get("premium_type", 0),
-            _avatar=payload.get("avatar"),
-            _banner=payload.get("banner"),
-            _accent_colour=payload.get("accent_colour"),
+            locale=data.get("locale"),
+            verified=data.get("verified", False),
+            _public_flags=data.get("public_flags", 0),
+            premium_type=data.get("premium_type", 0),
+            _avatar=data.get("avatar"),
+            _banner=data.get("banner"),
+            _accent_colour=data.get("accent_colour"),
         )
 
     @property
@@ -105,7 +110,7 @@ class User:
         data = await self._http._edit_user(
             username, avatar_data, self._session.access_token
         )
-        return User.from_payload(data, self._http, self._session)
+        return User.from_data(data, self._http, self._session)
 
     async def guilds(
         self,
@@ -119,7 +124,7 @@ class User:
             before, after, limit, with_counts, self._session.access_token
         )
         for i in data:
-            yield PartialGuild.from_payload(i, self._http)
+            yield PartialGuild.from_data(i, self._http)
 
     async def create_dm(self, user_id: int):
         data = await self._http._create_dm(user_id, self._session.access_token)
@@ -131,20 +136,32 @@ class User:
             access_tokens, nicks, self._session.access_token
         )
 
-    async def fetch_user_connections(self):
-        data = await self._http._get_user_connections(self._session.access_token)
-
-    async def fetch_user_application_role_connection(self, application_id: int):
-        data = await self._http._get_user_application_connection(
-            application_id, self._session.access_token
+    async def fetch_user_connections(self) -> List[Connection]:
+        data = await self._http._get_user_connections(
+            access_token=self._session.access_token
         )
+        return [Connection.from_data(i) for i in data]
+
+    async def fetch_user_application_role_connection(
+        self, application_id: int
+    ) -> ApplicationRoleConnection:
+        data = await self._http._get_user_application_connection(
+            application_id=application_id, access_token=self._session.access_token
+        )
+        return ApplicationRoleConnection.from_data(data)
 
     async def update_user_application_role_connection(
         self,
         application_id: int,
-    ):
-        ...
-
-
-# TODO
-# implement other endpoints
+        platform_name: Optional[str] = None,
+        platform_username: Optional[str] = None,
+        metadata: Optional[ApplicationRoleConnectionMetadata] = None,
+    ) -> ApplicationRoleConnection:
+        data = await self._http._update_user_application_connection(
+            application_id=application_id,
+            platform_name=platform_name,
+            platform_username=platform_username,
+            metadata=metadata.to_dict() if metadata else None,
+            access_token=self._session.access_token,
+        )
+        return ApplicationRoleConnection.from_data(data)

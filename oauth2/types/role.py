@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Optional, TypedDict, Tuple
+from typing import Optional, Tuple, TypedDict
 
 from typing_extensions import NotRequired
 

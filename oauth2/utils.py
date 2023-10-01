@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING, List, Literal, Optional
+import json
+from typing import TYPE_CHECKING, Any, List, Literal, Optional
 from urllib.parse import urlencode
 
 from typing_extensions import TypeAlias
@@ -14,6 +15,10 @@ if TYPE_CHECKING:
 BASE_OAUTH_AUTHORIZE_URL = "https://discord.com/oauth2/authorize?"
 ResponseTypes: TypeAlias = Literal["code", "token"]
 PromptTypes: TypeAlias = Literal["consent", "none"]
+
+
+def _to_json(obj: Any) -> str:
+    return json.dumps(obj, separators=(",", ":"), ensure_ascii=True)
 
 
 def get_oauth2_url(

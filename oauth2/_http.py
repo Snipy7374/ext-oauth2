@@ -9,6 +9,7 @@ from urllib.parse import quote as _uriquote
 import aiohttp
 
 from oauth2 import __version__
+from oauth2.utils import _to_json
 
 if TYPE_CHECKING:
     from oauth2.scopes import OAuthScopes
@@ -16,9 +17,12 @@ if TYPE_CHECKING:
         AccessExchangeTokenPayload,
         AccessTokenResponse,
         AppInfo,
+        ApplicationRoleConnection,
+        AppRoleConnectionPayload,
         AuthInfo,
         ClientCredentialsPayload,
         ClientCredentialsResponse,
+        Connection,
         GetGuildsParams,
         PartialGuild,
         RefreshTokenPayload,
@@ -82,6 +86,9 @@ class HTTPClient:
         method = route.method
         url = route.url
 
+        payload: Dict[str, Any] = kwargs.get("payload") or {}  # type: ignore # guess what, idc
+        params: Dict[str, Any] = kwargs.get("params") or {}
+
         if self.__session is None:
             await self.create_session()
 
@@ -104,8 +111,9 @@ class HTTPClient:
         if bearer:
             headers["Authorization"] = f"Bearer {kwargs['access_token']}"
 
-        payload: Dict[str, Any] = kwargs.get("payload") or {}
-        params: Dict[str, Any] = kwargs.get("params") or {}
+        if kwargs.get("json"):
+            headers["Content-Type"] = "application/json"
+            payload: str = _to_json(payload)
 
         async with self.__session.request(method, url, data=payload, headers=headers, auth=auth, params=params) as response:  # type: ignore
             response.raise_for_status()
@@ -193,6 +201,7 @@ class HTTPClient:
         return await self.request(
             Route("PATCH", "/users/@me"),
             payload=payload,
+            json=True,
             access_token=access_token,
         )
 
@@ -215,14 +224,14 @@ class HTTPClient:
             Route("GET", "/users/@me/guilds"), params=params, access_token=access_token
         )
 
-    async def _get_user_connections(self, access_token: str):
+    async def _get_user_connections(self, access_token: str) -> List[Connection]:
         return await self.request(
             Route("GET", "/users/@me/connections"), access_token=access_token
         )
 
     async def _get_user_application_connection(
         self, application_id: int, access_token: str
-    ):
+    ) -> ApplicationRoleConnection:
         return await self.request(
             Route("GET", f"/users/@me/applications/{application_id}/role-connection"),
             access_token=access_token,
@@ -236,11 +245,20 @@ class HTTPClient:
         platform_username: Optional[str],
         metadata: ...,
         access_token: str,
-    ):
-        payload = {}
+    ) -> ApplicationRoleConnection:
+        payload: AppRoleConnectionPayload = {}
+
+        if platform_name:
+            payload["platform_name"] = platform_name
+        if platform_username:
+            payload["platform_username"] = platform_username
+        if metadata:
+            payload["metadata"] = metadata
+
         return await self.request(
             Route("PUT", f"/users/@me/applications/{application_id}/role-connection"),
             payload=payload,
+            json=True,
             access_token=access_token,
         )
 

@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, List, Optional
 import attrs
 
 if TYPE_CHECKING:
-    from oauth2.types import Team as TeamPayload, TeamMember as TeamMemberPayload
+    from oauth2.types import Team as TeamData, TeamMember as TeamMemberData
 
 
 # this is ugly but whatever
@@ -28,12 +28,12 @@ class TeamMember:
     team: Team
 
     @classmethod
-    def from_payload(cls, payload: TeamMemberPayload, team: Team) -> TeamMember:
+    def from_data(cls, data: TeamMemberData, team: Team) -> TeamMember:
         return cls(
-            name=payload["user"]["username"],
-            id=payload["user"]["id"],  # type: ignore
-            permissions=payload["permissions"],
-            membership_state=payload["membership_state"],
+            name=data["user"]["username"],
+            id=data["user"]["id"],  # type: ignore
+            permissions=data["permissions"],
+            membership_state=data["membership_state"],
             team=team,
         )
 
@@ -47,13 +47,13 @@ class Team:
     owner_id: Optional[int] = None
 
     @classmethod
-    def from_payload(cls, payload: TeamPayload) -> Team:
+    def from_data(cls, data: TeamData) -> Team:
         team = cls(
-            id=payload["id"],  # type: ignore
-            name=payload["name"],
+            id=data["id"],  # type: ignore
+            name=data["name"],
             members=[],
-            _icon=payload.get("icon"),
-            owner_id=payload.get("owner_user_id"),  # type: ignore
+            _icon=data.get("icon"),
+            owner_id=data.get("owner_user_id"),  # type: ignore
         )
-        team.members = [TeamMember.from_payload(i, team) for i in payload["members"]]
+        team.members = [TeamMember.from_data(i, team) for i in data["members"]]
         return team

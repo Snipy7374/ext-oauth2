@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal, Optional, TypedDict, Tuple
+from typing import Literal, Optional, Tuple, TypedDict
 
 from typing_extensions import NotRequired
 

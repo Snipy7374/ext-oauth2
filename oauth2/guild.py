@@ -8,7 +8,7 @@ from oauth2.asset import Asset
 
 if TYPE_CHECKING:
     from oauth2._http import HTTPClient
-    from oauth2.types import Emoji, GuildFeature, PartialGuild as PartialGuildPayload
+    from oauth2.types import Emoji, GuildFeature, PartialGuild as PartialGuildData
 
 
 @attrs.define()
@@ -36,19 +36,17 @@ class PartialGuild(_BaseGuild):
     approximate_presence_count: Optional[int]
 
     @classmethod
-    def from_payload(
-        cls, payload: PartialGuildPayload, http: HTTPClient
-    ) -> PartialGuild:
+    def from_data(cls, data: PartialGuildData, http: HTTPClient) -> PartialGuild:
         return cls(
             _http=http,
-            id=payload["id"],  # type: ignore
-            name=payload["name"],
-            features=payload["features"],
-            _icon=payload["icon"],
-            owner=payload["owner"],
-            permissions=payload["permissions"],
-            approximate_member_count=payload.get("approximate_member_count"),
-            approximate_presence_count=payload.get("approximate_presence_count"),
+            id=data["id"],  # type: ignore
+            name=data["name"],
+            features=data["features"],
+            _icon=data["icon"],
+            owner=data["owner"],
+            permissions=data["permissions"],
+            approximate_member_count=data.get("approximate_member_count"),
+            approximate_presence_count=data.get("approximate_presence_count"),
         )
 
 

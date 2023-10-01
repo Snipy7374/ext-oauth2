@@ -74,8 +74,8 @@ class OAuth2Session:
 
     async def fetch_current_authorization_info(self) -> AuthorizationInfo:
         data = await self._client.http._get_current_auth_info(self.access_token)
-        return AuthorizationInfo.from_payload(data, self._client.http)
+        return AuthorizationInfo.from_data(data, self._client.http)
 
     async def fetch_current_user(self) -> User:
         data = await self._client.http._get_current_user(self.access_token)
-        return User.from_payload(data, self._client.http, self)
+        return User.from_data(data, self._client.http, self)

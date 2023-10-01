@@ -1,11 +1,11 @@
 from __future__ import annotations
-from typing import Union
-from typing_extensions import TypeAlias
 
+import enum
 import io
 import os
-import enum
+from typing import Union
 
+from typing_extensions import TypeAlias
 
 FileLike: TypeAlias = Union[str, bytes, os.PathLike, io.BufferedIOBase]
 
