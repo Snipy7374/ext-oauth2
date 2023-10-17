@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TypedDict, Tuple, Literal, List, Optional, Dict
+from typing import TypedDict, Tuple, Literal, List, Optional
 from typing_extensions import NotRequired
 
 from . import Snowflake, PartialIntegration, LocalizationDict

@@ -8,6 +8,7 @@ from oauth2.types import Snowflake
 
 __all__: Tuple[str, ...] = (
     "PartialUser",
+    "PartialDMUser",
     "User",
 )
 
@@ -18,6 +19,15 @@ class PartialUser(TypedDict):
     discriminator: str  # may be removed in future API versions
     global_name: NotRequired[Optional[str]]
     avatar: Optional[str]
+
+
+class PartialDMUser(PartialUser):
+    public_flags: NotRequired[int]
+    flags: NotRequired[int]
+    banner: Optional[str]
+    banner_color: NotRequired[Optional[str]]
+    accent_color: NotRequired[Optional[int]]
+    avatar_decoration_data: NotRequired[Optional[str]]
 
 
 PremiumType = Literal[0, 1, 2]

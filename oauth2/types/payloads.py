@@ -1,8 +1,10 @@
-from typing import Tuple, TypedDict
+from typing import Tuple, TypedDict, List
 
 from typing_extensions import NotRequired
 
 from . import ApplicationRoleConnectionMetadata, Guild
+from . import Snowflake
+from .channel import Nick
 
 __all__: Tuple[str, ...] = (
     "AccessExchangeTokenPayload",
@@ -14,6 +16,8 @@ __all__: Tuple[str, ...] = (
     "RevokeTokenPayload",
     "GetGuildsParams",
     "AppRoleConnectionPayload",
+    "AddGuildMemberPayload",
+    "CreateGroupDMPayload",
 )
 
 
@@ -74,3 +78,16 @@ class AppRoleConnectionPayload(TypedDict, total=False):
     platform_name: str
     platform_username: str
     metadata: ApplicationRoleConnectionMetadata
+
+
+class AddGuildMemberPayload(TypedDict):
+    access_token: str
+    nick: NotRequired[str]
+    roles: NotRequired[List[Snowflake]]
+    mute: NotRequired[bool]
+    deaf: NotRequired[bool]
+
+
+class CreateGroupDMPayload(TypedDict):
+    access_tokens: List[str]
+    nicks: List[Nick]

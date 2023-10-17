@@ -126,16 +126,6 @@ class User:
         for i in data:
             yield PartialGuild.from_data(i, self._http)
 
-    async def create_dm(self, user_id: int):
-        data = await self._http._create_dm(user_id, self._session.access_token)
-
-    async def create_group_dm(self, users: List[User]):
-        access_tokens = [i.session.access_token for i in users]
-        nicks = {i.id: i.username for i in users}
-        data = await self._http._create_group_dm(
-            access_tokens, nicks, self._session.access_token
-        )
-
     async def fetch_user_connections(self) -> List[Connection]:
         data = await self._http._get_user_connections(
             access_token=self._session.access_token

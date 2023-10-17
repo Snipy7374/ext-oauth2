@@ -13,6 +13,7 @@ from .role import *
 from .sticker import *
 from .team import *
 from .user import *
+from .channel import *
 
 Snowflake: TypeAlias = Union[str, int]
 SnowflakeList: TypeAlias = Union[List[str], List[int]]

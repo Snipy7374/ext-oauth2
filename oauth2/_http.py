@@ -28,7 +28,10 @@ if TYPE_CHECKING:
         RefreshTokenPayload,
         RevokeTokenPayload,
         User,
-    )
+        AddGuildMemberPayload,
+        GroupDMChannel,
+        CreateGroupDMPayload,
+)
 
 __all__: Tuple[str, ...] = ("HTTPClient", "Route")
 _log = logging.getLogger(__name__)
@@ -277,13 +280,13 @@ class HTTPClient:
         mute: Optional[bool],
         deaf: Optional[bool],
         access_token: str,
-    ):
-        payload = {"access_token": access_token}
+    ) -> None:
+        payload: AddGuildMemberPayload = {"access_token": access_token}
 
         if nick:
             payload["nick"] = nick
         if roles:
-            payload["roles"] = roles
+            payload["roles"] = roles  # type: ignore
         if mute:
             payload["mute"] = mute
         if deaf:
@@ -294,39 +297,49 @@ class HTTPClient:
             bearer=False,
             headers={"Authorization": f"Bot {self.__bot_token}"},
             payload=payload,
-        )
-
-    async def _create_dm(self, member_id: int, access_token: str):
-        payload = {"recipient_id": member_id}
-
-        return await self.request(
-            Route("POST", "/users/@me/channels"),
-            access_token=access_token,
-            payload=payload,
+            json=True,
         )
 
     async def _create_group_dm(
-        self, access_tokens: List[str], nicks: Dict[int, str], access_token: str
-    ):
-        payload = {"access_tokens": access_tokens, "nicks": nicks}
-
+        self,
+        access_tokens: List[str],
+        nicks: List[Dict[int, str]]
+    ) -> GroupDMChannel:
+        payload: CreateGroupDMPayload = {"access_tokens": access_tokens, "nicks": nicks}  # type: ignore
         return await self.request(
             Route("POST", "/users/@me/channels"),
-            access_token=access_token,
+            bearer=False,
+            headers={"Authorization": f"Bot {self.__bot_token}"},
             payload=payload,
+            json=True,
         )
 
-    async def _group_dm_add_user(
+    # the bot must be the gdm owner, see the postman requests
+    async def _add_group_dm_user(
         self,
         channel_id: int,
         user_id: int,
-        nick: str,
-        user_access_token: str,
         access_token: str,
-    ):
-        payload = {"access_token": user_access_token, "nick": nick}
+        nick: str,
+    ) -> None:
+        payload = {"access_token": access_token, "nick": nick}
         return await self.request(
             Route("PUT", f"/channels/{channel_id}/recipients/{user_id}"),
             payload=payload,
-            access_token=access_token,
+            json=True,
+            headers={"Authorization": f"Bot {self.__bot_token}"},
+            bearer=False,
         )
+
+    # same as above
+    async def _remove_group_dm_user(
+        self,
+        channel_id: int,
+        user_id: int,
+    ) -> None:
+        return await self.request(
+            Route("DELETE", f"/channels/{channel_id}/recipients/{user_id}"),
+            headers={"Authorization": f"Bot {self.__bot_token}"},
+            bearer=False,
+        )
+
