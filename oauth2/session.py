@@ -21,7 +21,7 @@ class OAuth2Session:
     expires_in: datetime.datetime = attrs.field(converter=to_datetime)
     scope: str
     _client: Client
-    state_security_key: Optional[str] = None
+    state_code: Optional[str] = None
     refresh_token: Optional[str] = None
     guild_id: Optional[int] = attrs.field(default=None, converter=to_int)
     permissions: Optional[int] = attrs.field(default=None, converter=to_int)
@@ -79,3 +79,23 @@ class OAuth2Session:
     async def fetch_current_user(self) -> User:
         data = await self._client.http._get_current_user(self.access_token)
         return User.from_data(data, self._client.http, self)
+
+    async def add_current_user_to_group_dm(self, channel_id: int, *, user_id: Optional[int] = None, nick: Optional[str] = None) -> None:
+        if not user_id:
+            user = await self.fetch_current_user()
+
+        await self._client.http._add_group_dm_user(
+            channel_id,
+            user_id if user_id else user.id,
+            self.access_token,
+            nick if nick else user.username
+        )
+
+    async def remove_current_user_from_group_dm(self, channel_id: int, *, user_id: Optional[int] = None) -> None:
+        if not user_id:
+            user = await self.fetch_current_user()
+
+        await self._client.http._remove_group_dm_user(
+            channel_id,
+            user_id if user_id else user.id
+        )

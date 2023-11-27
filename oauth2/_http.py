@@ -303,7 +303,7 @@ class HTTPClient:
     async def _create_group_dm(
         self,
         access_tokens: List[str],
-        nicks: List[Dict[int, str]]
+        nicks: Dict[int, str]
     ) -> GroupDMChannel:
         payload: CreateGroupDMPayload = {"access_tokens": access_tokens, "nicks": nicks}  # type: ignore
         return await self.request(

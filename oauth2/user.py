@@ -18,6 +18,7 @@ if TYPE_CHECKING:
     from oauth2.file import File
     from oauth2.session import OAuth2Session
     from oauth2.types import User as UserData
+    from oauth2.types import PartialDMUser
 
 
 @attrs.define(slots=True, repr=True)
@@ -32,7 +33,7 @@ class User:
     verified: bool
     _public_flags: int
     premium_type: int
-    _session: OAuth2Session
+    _session: Optional[OAuth2Session]
     locale: Optional[str] = None
     _avatar_decoration: Optional[str] = None
     email: Optional[str] = None
@@ -43,7 +44,7 @@ class User:
 
     @classmethod
     def from_data(
-        cls, data: UserData, http: HTTPClient, session: OAuth2Session
+        cls, data: UserData | PartialDMUser, http: HTTPClient, session: Optional[OAuth2Session] = None
     ) -> User:
         return cls(
             _http=http,
@@ -90,8 +91,9 @@ class User:
             )
 
     @property
-    def session(self) -> OAuth2Session:
-        return self._session
+    def session(self) -> Optional[OAuth2Session]:
+        if self._session:
+            return self._session
 
     async def _avatar_helper(self, file: Optional[File] = None) -> Optional[str]:
         if not file:
@@ -106,6 +108,9 @@ class User:
     async def edit(
         self, username: Optional[str] = None, avatar: Optional[File] = None
     ) -> User:
+        if not self._session:
+            raise AttributeError("This user object can't be edited because it doesn't have a `session` linked.")
+
         avatar_data = await self._avatar_helper(avatar)
         data = await self._http._edit_user(
             username, avatar_data, self._session.access_token
@@ -120,6 +125,9 @@ class User:
         limit: int = 200,
         with_counts: bool = False,
     ) -> AsyncIterator[PartialGuild]:
+        if not self._session:
+            raise AttributeError("This user object can't be edited because it doesn't have a `session` linked.")
+
         data = await self._http._get_user_guids(
             before, after, limit, with_counts, self._session.access_token
         )
@@ -127,6 +135,9 @@ class User:
             yield PartialGuild.from_data(i, self._http)
 
     async def fetch_user_connections(self) -> List[Connection]:
+        if not self._session:
+            raise AttributeError("This user object can't be edited because it doesn't have a `session` linked.")
+
         data = await self._http._get_user_connections(
             access_token=self._session.access_token
         )
@@ -135,6 +146,9 @@ class User:
     async def fetch_user_application_role_connection(
         self, application_id: int
     ) -> ApplicationRoleConnection:
+        if not self._session:
+            raise AttributeError("This user object can't be edited because it doesn't have a `session` linked.")
+
         data = await self._http._get_user_application_connection(
             application_id=application_id, access_token=self._session.access_token
         )
@@ -147,6 +161,9 @@ class User:
         platform_username: Optional[str] = None,
         metadata: Optional[ApplicationRoleConnectionMetadata] = None,
     ) -> ApplicationRoleConnection:
+        if not self._session:
+            raise AttributeError("This user object can't be edited because it doesn't have a `session` linked.")
+
         data = await self._http._update_user_application_connection(
             application_id=application_id,
             platform_name=platform_name,

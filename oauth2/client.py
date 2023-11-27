@@ -4,7 +4,7 @@ import asyncio
 import collections
 import logging
 import secrets
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List, Dict
 
 import aiohttp
 
@@ -102,3 +102,6 @@ class Client:
     async def fetch_application_info(self) -> AppInfo:
         data = await self.http._get_app_info()
         return AppInfo.from_data(data, self.http)
+
+    async def create_group_dm(self, access_tokens: List[str], nicks: Dict[int, str]):
+        data = await self.http._create_group_dm(access_tokens, nicks)
