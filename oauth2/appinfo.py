@@ -8,6 +8,7 @@ import attrs
 from oauth2.asset import Asset
 from oauth2.scopes import OAuthScopes
 from oauth2.team import Team
+from oauth2.user import User
 from oauth2.utils import _to_install_params, _to_oauth2_scopes
 
 if TYPE_CHECKING:
@@ -17,6 +18,7 @@ if TYPE_CHECKING:
         AuthInfo as AuthInfoData,
         PartialAppInfo as PartialAppInfoData,
     )
+    from oauth2.session import OAuth2Session
 
 
 @attrs.define(slots=True, repr=True)
@@ -33,7 +35,7 @@ class AppInfo:
     description: str
     bot_public: bool
     bot_require_code_grant: bool
-    owner: ...  # User
+    owner: User  # User
     verify_key: str
     rpc_origins: Optional[List[str]] = None
     _cover_image: Optional[str] = None
@@ -69,7 +71,7 @@ class AppInfo:
             rpc_origins=data.get("rpc_origins"),
             bot_public=data["bot_public"],
             bot_require_code_grant=data["bot_require_code_grant"],
-            owner=owner_data,
+            owner=User.from_data(owner_data, http),
             team=(Team.from_data(team_data) if team_data else None),
             guild_id=data.get("guild_id"),  # type: ignore
             primary_sku_id=data.get("primary_sku_id"),  # type: ignore
@@ -130,13 +132,15 @@ class AuthorizationInfo:
     application: PartialAppInfo
     scopes: OAuthScopes = attrs.field(converter=_to_oauth2_scopes)
     expires: datetime.datetime = attrs.field(converter=datetime.datetime.fromisoformat)
-    user: ...
+    user: Optional[User] = None
 
     @classmethod
-    def from_data(cls, data: AuthInfoData, http: HTTPClient) -> AuthorizationInfo:
+    def from_data(
+        cls, data: AuthInfoData, http: HTTPClient, session: OAuth2Session
+    ) -> AuthorizationInfo:
         return cls(
             application=PartialAppInfo.from_data(data["application"], http),
             scopes=data["scopes"],
             expires=data["expires"],
-            user=data["user"],
+            user=User.from_data(data["user"], http, session),
         )

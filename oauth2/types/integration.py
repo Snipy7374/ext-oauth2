@@ -7,7 +7,12 @@ from typing_extensions import NotRequired
 from . import Snowflake
 from .user import User
 
-__all__: Tuple[str, ...] = ("PartialIntegration", "Integration", "IntegrationType", "IntegrationAccount",)
+__all__: Tuple[str, ...] = (
+    "PartialIntegration",
+    "Integration",
+    "IntegrationType",
+    "IntegrationAccount",
+)
 
 
 class IntegrationApplication(TypedDict):

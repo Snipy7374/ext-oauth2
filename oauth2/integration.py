@@ -4,7 +4,11 @@ from typing import Optional, TYPE_CHECKING
 import attrs
 
 if TYPE_CHECKING:
-    from oauth2.types import IntegrationType, PartialIntegration as PartialIntegrationData, IntegrationAccount as IntegrationAccountData
+    from oauth2.types import (
+        IntegrationType,
+        PartialIntegration as PartialIntegrationData,
+        IntegrationAccount as IntegrationAccountData,
+    )
 
 
 @attrs.define(repr=True, slots=True)
@@ -14,10 +18,7 @@ class IntegrationAccount:
 
     @classmethod
     def from_data(cls, data: IntegrationAccountData) -> IntegrationAccount:
-        return cls(
-            id=data["id"],  # type: ignore
-            name=data["name"]
-        )
+        return cls(id=data["id"], name=data["name"])  # type: ignore
 
 
 @attrs.define(repr=True, slots=True)

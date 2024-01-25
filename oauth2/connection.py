@@ -7,7 +7,12 @@ import attrs
 from oauth2.integration import PartialIntegration
 
 if TYPE_CHECKING:
-    from oauth2.types import ApplicationRoleConnection as ApplicationRoleConnectionResponse, LocalizationDict, ApplicationRoleConnectionMetadata as ApplicationRoleConnectionMetadataResponse, Connection as ConnectionData
+    from oauth2.types import (
+        ApplicationRoleConnection as ApplicationRoleConnectionResponse,
+        LocalizationDict,
+        ApplicationRoleConnectionMetadata as ApplicationRoleConnectionMetadataResponse,
+        Connection as ConnectionData,
+    )
 
 __all__: Tuple[str, ...] = (
     "ApplicationRoleConnection",
@@ -102,7 +107,9 @@ class ApplicationRoleConnectionMetadata:
     description_localizations: Optional[LocalizationDict] = None
 
     @classmethod
-    def from_data(cls, data: ApplicationRoleConnectionMetadataResponse) -> ApplicationRoleConnectionMetadata:
+    def from_data(
+        cls, data: ApplicationRoleConnectionMetadataResponse
+    ) -> ApplicationRoleConnectionMetadata:
         return cls(
             type=MetadataType(data["type"]),
             key=data["key"],
@@ -135,7 +142,9 @@ class ApplicationRoleConnection:
     platform_username: Optional[str] = None
 
     @classmethod
-    def from_data(cls, data: ApplicationRoleConnectionResponse) -> ApplicationRoleConnection:
+    def from_data(
+        cls, data: ApplicationRoleConnectionResponse
+    ) -> ApplicationRoleConnection:
         return cls(
             metadata=ApplicationRoleConnectionMetadata.from_data(data["metadata"]),
             platform_name=data["platform_name"],

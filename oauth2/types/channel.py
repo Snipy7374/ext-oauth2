@@ -4,7 +4,10 @@ from typing import TypedDict, Optional, Literal, List, Dict, Tuple
 from . import Snowflake
 from . import PartialDMUser
 
-__all__: Tuple[str, ...] = ("DMChannel", "GroupDMChannel",)
+__all__: Tuple[str, ...] = (
+    "DMChannel",
+    "GroupDMChannel",
+)
 
 
 Nick = Dict[Snowflake, str]

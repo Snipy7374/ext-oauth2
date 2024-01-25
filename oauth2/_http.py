@@ -31,7 +31,7 @@ if TYPE_CHECKING:
         AddGuildMemberPayload,
         GroupDMChannel,
         CreateGroupDMPayload,
-)
+    )
 
 __all__: Tuple[str, ...] = ("HTTPClient", "Route")
 _log = logging.getLogger(__name__)
@@ -301,9 +301,7 @@ class HTTPClient:
         )
 
     async def _create_group_dm(
-        self,
-        access_tokens: List[str],
-        nicks: Dict[int, str]
+        self, access_tokens: List[str], nicks: Dict[int, str]
     ) -> GroupDMChannel:
         payload: CreateGroupDMPayload = {"access_tokens": access_tokens, "nicks": nicks}  # type: ignore
         return await self.request(
@@ -342,4 +340,3 @@ class HTTPClient:
             headers={"Authorization": f"Bot {self.__bot_token}"},
             bearer=False,
         )
-

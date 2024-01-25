@@ -4,7 +4,11 @@ from typing_extensions import NotRequired
 
 from . import Snowflake, PartialIntegration, LocalizationDict
 
-__all__: Tuple[str, ...] = ("Connection", "ApplicationRoleConnection", "ApplicationRoleConnectionMetadata",)
+__all__: Tuple[str, ...] = (
+    "Connection",
+    "ApplicationRoleConnection",
+    "ApplicationRoleConnectionMetadata",
+)
 
 
 ConnectionType = Literal[
@@ -26,7 +30,7 @@ ConnectionType = Literal[
     "twitch",
     "twitter",
     "xbox",
-    "youtube"
+    "youtube",
 ]
 Visibility = Literal[0, 1]
 ApplicationRoleConnectionMetadataType = Literal[1, 2, 3, 4, 5, 6, 7, 8]

@@ -2,10 +2,9 @@ from __future__ import annotations
 
 import datetime
 import json
-from typing import TYPE_CHECKING, Any, List, Literal, Optional
+from enum import Enum
+from typing import TYPE_CHECKING, Any, List, Optional
 from urllib.parse import urlencode
-
-from typing_extensions import TypeAlias
 
 if TYPE_CHECKING:
     from oauth2.appinfo import InstallParams
@@ -13,8 +12,16 @@ if TYPE_CHECKING:
     from oauth2.types import InstallParams as InstallParamsPayload
 
 BASE_OAUTH_AUTHORIZE_URL = "https://discord.com/oauth2/authorize?"
-ResponseTypes: TypeAlias = Literal["code", "token"]
-PromptTypes: TypeAlias = Literal["consent", "none"]
+
+
+class ResponseType(Enum):
+    code = "code"
+    token = "token"  # noqa: S105
+
+
+class PromptType(Enum):
+    consent = "consent"
+    none = "none"
 
 
 def _to_json(obj: Any) -> str:
@@ -28,9 +35,9 @@ def get_oauth2_url(
     permissions: Optional[int] = None,
     guild_id: Optional[int] = None,
     disable_guild_select: bool = False,
-    response_type: ResponseTypes = "code",
+    response_type: ResponseType = ResponseType.code,
     state: Optional[str] = None,
-    prompt: PromptTypes = "consent",
+    prompt: PromptType = PromptType.consent,
 ) -> str:
     url = f"https://discord.com/oauth2/authorize?client_id={client_id}"
     if scopes:
@@ -39,14 +46,14 @@ def get_oauth2_url(
         url += f"&permissions={permissions}"
     if guild_id is not None:
         url += f"&guild_id={guild_id}"
-    url += f"&response_type={response_type}&" + urlencode(
+    url += f"&response_type={response_type.value}&" + urlencode(
         {"redirect_uri": redirect_uri}
     )
     if disable_guild_select:
         url += "&disable_guild_select=true"
     if state:
         url += f"&state={state}"
-    url += f"&prompt={prompt}"
+    url += f"&prompt={prompt.value}"
     return url
 
 

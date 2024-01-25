@@ -44,7 +44,10 @@ class User:
 
     @classmethod
     def from_data(
-        cls, data: UserData | PartialDMUser, http: HTTPClient, session: Optional[OAuth2Session] = None
+        cls,
+        data: UserData | PartialDMUser,
+        http: HTTPClient,
+        session: Optional[OAuth2Session] = None,
     ) -> User:
         return cls(
             _http=http,
@@ -109,7 +112,9 @@ class User:
         self, username: Optional[str] = None, avatar: Optional[File] = None
     ) -> User:
         if not self._session:
-            raise AttributeError("This user object can't be edited because it doesn't have a `session` linked.")
+            raise AttributeError(
+                "This user object can't be edited because it doesn't have a `session` linked."
+            )
 
         avatar_data = await self._avatar_helper(avatar)
         data = await self._http._edit_user(
@@ -126,7 +131,9 @@ class User:
         with_counts: bool = False,
     ) -> AsyncIterator[PartialGuild]:
         if not self._session:
-            raise AttributeError("This user object can't be edited because it doesn't have a `session` linked.")
+            raise AttributeError(
+                "This user object can't be edited because it doesn't have a `session` linked."
+            )
 
         data = await self._http._get_user_guids(
             before, after, limit, with_counts, self._session.access_token
@@ -136,7 +143,9 @@ class User:
 
     async def fetch_user_connections(self) -> List[Connection]:
         if not self._session:
-            raise AttributeError("This user object can't be edited because it doesn't have a `session` linked.")
+            raise AttributeError(
+                "This user object can't be edited because it doesn't have a `session` linked."
+            )
 
         data = await self._http._get_user_connections(
             access_token=self._session.access_token
@@ -147,7 +156,9 @@ class User:
         self, application_id: int
     ) -> ApplicationRoleConnection:
         if not self._session:
-            raise AttributeError("This user object can't be edited because it doesn't have a `session` linked.")
+            raise AttributeError(
+                "This user object can't be edited because it doesn't have a `session` linked."
+            )
 
         data = await self._http._get_user_application_connection(
             application_id=application_id, access_token=self._session.access_token
@@ -162,7 +173,9 @@ class User:
         metadata: Optional[ApplicationRoleConnectionMetadata] = None,
     ) -> ApplicationRoleConnection:
         if not self._session:
-            raise AttributeError("This user object can't be edited because it doesn't have a `session` linked.")
+            raise AttributeError(
+                "This user object can't be edited because it doesn't have a `session` linked."
+            )
 
         data = await self._http._update_user_application_connection(
             application_id=application_id,

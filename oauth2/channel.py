@@ -28,5 +28,5 @@ class GroupDMChannel:
             data["owner_id"],
             data["icon"],
             data["name"],
-            http
+            http,
         )
